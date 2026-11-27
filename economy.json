@@ -1,0 +1,26 @@
+{
+  "_comment": "Economy config (Hamada 11 placeholder). Hamada 10 supplies the real market.json; replace items with its base prices and bands.",
+  "default": { "base_price": 10, "min_mult": 0.6, "max_mult": 1.8 },
+  "items": {
+    "wheat": { "base_price": 5, "min_mult": 0.6, "max_mult": 1.8 },
+    "clover_berseem": { "base_price": 4 },
+    "fava_beans": { "base_price": 8 },
+    "onion": { "base_price": 7 },
+    "garlic": { "base_price": 9 },
+    "cotton": { "base_price": 14 },
+    "maize": { "base_price": 6 },
+    "watermelon": { "base_price": 12 },
+    "rice": { "base_price": 8 },
+    "sugarcane": { "base_price": 9 },
+    "molokhia": { "base_price": 6 },
+    "milk": { "base_price": 15 },
+    "eggs": { "base_price": 10 },
+    "wool": { "base_price": 18 },
+    "fish": { "base_price": 16 }
+  },
+  "market": { "recovery_tau_hours": 6, "sell_impact_per_unit": 0.001 },
+  "players": { "starting_coins": 200 },
+  "tournaments": { "max_delta_per_minute": 1000, "payout_coins": [1000, 500, 250], "default_metric": "coins_earned" },
+  "auctions": { "anti_snipe_window_sec": 120, "anti_snipe_extend_sec": 120, "min_increment": 5, "items": ["golden_sickle", "silver_rod", "fanoos", "carousel_ticket_gold", "nile_lotus_decor"] },
+  "guilds": { "order_reward_pool_coins": 2000, "order_size_units": 200 }
+}

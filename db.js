@@ -97,12 +97,14 @@ CREATE TABLE IF NOT EXISTS guild_contributions (
 );
 CREATE TABLE IF NOT EXISTS tournaments (
   id UUID PRIMARY KEY,
+  kind TEXT NOT NULL DEFAULT 'harvest_race',
   metric TEXT NOT NULL,
   starts_at TIMESTAMPTZ NOT NULL,
   ends_at TIMESTAMPTZ NOT NULL,
   status TEXT NOT NULL DEFAULT 'open',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'harvest_race';
 CREATE TABLE IF NOT EXISTS tournament_scores (
   tournament_id UUID NOT NULL REFERENCES tournaments(id),
   player_id UUID NOT NULL REFERENCES players(id),

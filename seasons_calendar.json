@@ -1,0 +1,291 @@
+{
+  "schema": "mazraa-calendar/v1",
+  "game": "مزرعة الحي",
+  "config": {
+    "realSecondsPerGameDay": 600,
+    "dayStartHour": 6,
+    "seasonSystem": "egyptian-nile",
+    "defaultYear": 2026
+  },
+  "seasons": [
+    {
+      "id": "shitwi",
+      "name_ar": "الشتوي",
+      "name_en": "Winter (Shitwi)",
+      "months": [[11, 15], [4, 30]],
+      "wraps_year": true,
+      "wrap_start_month": 11,
+      "wrap_end_month": 4,
+      "start_day": { "month": 11, "day": 15 },
+      "end_day": { "month": 4, "day": 30 },
+      "palette": { "sky": "#bfe3ff", "ground": "#7fae5a", "tint": "#dff0d8" },
+      "crop_boost": ["wheat", "clover_berseem", "fava_beans", "onion", "garlic", "flax", "chickpeas"],
+      "crop_penalty": ["rice", "sugarcane", "watermelon"],
+      "weather_weights": { "sunny": 45, "cloudy": 25, "rain": 22, "khamsin": 3, "frost": 5 },
+      "watering_multiplier": 0.75,
+      "notes_ar": "موسم القمح والبرسيم والفول والبصل"
+    },
+    {
+      "id": "sayfi",
+      "name_ar": "الصيفي",
+      "name_en": "Summer (Sayfi)",
+      "months": [[5, 1], [7, 31]],
+      "wraps_year": false,
+      "start_day": { "month": 5, "day": 1 },
+      "end_day": { "month": 7, "day": 31 },
+      "palette": { "sky": "#ffe9a8", "ground": "#c9a45a", "tint": "#fff3c4" },
+      "crop_boost": ["cotton", "maize", "watermelon", "cantaloupe", "sunflower", "peanuts", "tomato"],
+      "crop_penalty": ["wheat", "clover_berseem"],
+      "weather_weights": { "sunny": 70, "cloudy": 10, "rain": 0, "khamsin": 15, "heatwave": 5 },
+      "watering_multiplier": 1.6,
+      "notes_ar": "موسم القطن والذرة والبطيخ - احترس من الخماسين"
+    },
+    {
+      "id": "nili",
+      "name_ar": "النيلي",
+      "name_en": "Nile flood season (Nili)",
+      "months": [[8, 1], [11, 14]],
+      "wraps_year": false,
+      "start_day": { "month": 8, "day": 1 },
+      "end_day": { "month": 11, "day": 14 },
+      "palette": { "sky": "#a8d8ff", "ground": "#5a9e6f", "tint": "#d0ebff" },
+      "crop_boost": ["rice", "maize", "sugarcane", "okra", "eggplant", "molokhia"],
+      "crop_penalty": ["wheat"],
+      "weather_weights": { "sunny": 55, "cloudy": 20, "rain": 10, "khamsin": 5, "humid": 10 },
+      "watering_multiplier": 0.6,
+      "nile_flood": { "start_day": { "month": 8, "day": 15 }, "end_day": { "month": 9, "day": 5 }, "soil_fertility_bonus": 1.25 },
+      "notes_ar": "موسم فيضان النيل - الأرض بتتسمّد لوحدها وقت الوفاء بالنيل"
+    }
+  ],
+  "events": [
+    {
+      "id": "ramadan",
+      "type": "festival",
+      "date_source": "hijri_lookup",
+      "name_ar": "رمضان",
+      "name_en": "Ramadan",
+      "dates": {
+        "2026": { "start": "2026-02-18", "end": "2026-03-19" },
+        "2027": { "start": "2027-02-08", "end": "2027-03-09" },
+        "2028": { "start": "2028-01-28", "end": "2028-02-26" },
+        "2029": { "start": "2029-01-16", "end": "2029-02-14" },
+        "2030": { "start": "2030-01-05", "end": "2030-02-03" }
+      },
+      "effects": {
+        "market_price_multiplier": 1.3,
+        "visitor_spawn_multiplier": 1.5,
+        "decoration_theme": "ramadan_lanterns",
+        "shop_items": ["fanoos", "dates_crop", "kunafa_stall", "qamar_el_din"],
+        "music_key": "ramadan_nights",
+        "npc_behavior": "fasting_daytime_feast_night",
+        "night_activity_boost": 2.0
+      },
+      "quests": ["iftar_table", "collect_7_fawanees"]
+    },
+    {
+      "id": "eid_fitr",
+      "type": "festival",
+      "date_source": "hijri_lookup",
+      "name_ar": "عيد الفطر",
+      "name_en": "Eid al-Fitr",
+      "dates": {
+        "2026": { "start": "2026-03-20", "end": "2026-03-22" },
+        "2027": { "start": "2027-03-10", "end": "2027-03-12" },
+        "2028": { "start": "2028-02-27", "end": "2028-02-29" },
+        "2029": { "start": "2029-02-15", "end": "2029-02-17" },
+        "2030": { "start": "2030-02-04", "end": "2030-02-06" }
+      },
+      "effects": {
+        "market_price_multiplier": 1.5,
+        "visitor_spawn_multiplier": 2.0,
+        "decoration_theme": "eid_balloons",
+        "shop_items": ["kahk_stall", "eidiya_gift_box", "balloon_cart"],
+        "music_key": "eid_morning",
+        "gift_currency_chance": 0.25
+      },
+      "quests": ["bake_kahk", "give_eidiya_5_children"]
+    },
+    {
+      "id": "eid_adha",
+      "type": "festival",
+      "date_source": "hijri_lookup",
+      "name_ar": "عيد الأضحى",
+      "name_en": "Eid al-Adha",
+      "dates": {
+        "2026": { "start": "2026-05-27", "end": "2026-05-30" },
+        "2027": { "start": "2027-05-17", "end": "2027-05-20" },
+        "2028": { "start": "2028-05-06", "end": "2028-05-09" },
+        "2029": { "start": "2029-04-25", "end": "2029-04-28" },
+        "2030": { "start": "2030-04-14", "end": "2030-04-17" }
+      },
+      "effects": {
+        "market_price_multiplier": 1.4,
+        "animal_sale_price_multiplier": 1.6,
+        "decoration_theme": "eid_adha",
+        "shop_items": ["odhayya_sheep", "bbq_stall"],
+        "music_key": "eid_morning"
+      },
+      "quests": ["raise_healthy_sheep", "share_meat_neighbors"]
+    },
+    {
+      "id": "moulid_nabi",
+      "type": "festival",
+      "date_source": "hijri_lookup",
+      "name_ar": "المولد النبوي",
+      "name_en": "Moulid al-Nabi",
+      "dates": {
+        "2026": { "start": "2026-08-24", "end": "2026-08-26" },
+        "2027": { "start": "2027-08-14", "end": "2027-08-16" },
+        "2028": { "start": "2028-08-03", "end": "2028-08-05" },
+        "2029": { "start": "2029-07-23", "end": "2029-07-25" },
+        "2030": { "start": "2030-07-12", "end": "2030-07-14" }
+      },
+      "effects": {
+        "decoration_theme": "moulid_lights",
+        "shop_items": ["halawet_el_moulid", "arouset_el_moulid", "farrouj_cart"],
+        "music_key": "moulid_band",
+        "visitor_spawn_multiplier": 1.4
+      },
+      "quests": ["deliver_halawa_to_mosque"]
+    },
+    {
+      "id": "moulid_badawi",
+      "type": "moulid",
+      "date_source": "hijri_lookup",
+      "name_ar": "مولد السيد البدوي",
+      "name_en": "Moulid Sayyid al-Badawi (Tanta)",
+      "dates": {
+        "2026": { "start": "2026-10-09", "end": "2026-10-16" },
+        "2027": { "start": "2027-09-28", "end": "2027-10-05" },
+        "2028": { "start": "2028-09-16", "end": "2028-09-23" }
+      },
+      "effects": {
+        "decoration_theme": "moulid_fair",
+        "shop_items": ["carousel", "lollipop_stand", "baladi_games"],
+        "music_key": "moulid_band",
+        "visitor_spawn_multiplier": 1.8,
+        "tournament_hook": "moulid_games_cup"
+      },
+      "quests": ["moulid_fair_vendor"]
+    },
+    {
+      "id": "sham_nessim",
+      "type": "festival",
+      "date_source": "computed_coptic_easter_monday",
+      "name_ar": "شم النسيم",
+      "name_en": "Sham el-Nessim",
+      "dates": {
+        "2026": { "start": "2026-04-13", "end": "2026-04-13" },
+        "2027": { "start": "2027-05-03", "end": "2027-05-03" },
+        "2028": { "start": "2028-04-17", "end": "2028-04-17" },
+        "2029": { "start": "2029-04-09", "end": "2029-04-09" },
+        "2030": { "start": "2030-04-29", "end": "2030-04-29" }
+      },
+      "effects": {
+        "decoration_theme": "spring_flowers",
+        "shop_items": ["fesikh_picnic", "colored_eggs", "kite"],
+        "fish_sale_price_multiplier": 1.3,
+        "egg_sale_price_multiplier": 1.5,
+        "music_key": "spring_day"
+      },
+      "quests": ["picnic_by_the_nile"]
+    },
+    {
+      "id": "wafaa_nil",
+      "type": "seasonal_ceremony",
+      "date_source": "fixed",
+      "name_ar": "وفاء النيل",
+      "name_en": "Wafaa el-Nil (Nile loyalty festival)",
+      "dates": {
+        "*": { "start": "*-08-15", "end": "*-08-22" }
+      },
+      "effects": {
+        "decoration_theme": "nile_lotus",
+        "shop_items": ["lotus_boat", "flower_garland"],
+        "crop_growth_multiplier": 1.2,
+        "music_key": "nile_evening"
+      },
+      "quests": ["throw_flowers_to_nile"]
+    },
+    {
+      "id": "wheat_harvest_festival",
+      "type": "harvest",
+      "date_source": "fixed",
+      "name_ar": "فرحة الحصاد",
+      "name_en": "Wheat Harvest Festival",
+      "dates": {
+        "*": { "start": "*-04-15", "end": "*-04-25" }
+      },
+      "effects": {
+        "wheat_price_multiplier": 1.4,
+        "wheat_yield_multiplier": 1.25,
+        "decoration_theme": "golden_harvest",
+        "music_key": "harvest_drum"
+      },
+      "quests": ["harvest_50_wheat_3_days"],
+      "tournament_hook": "great_harvest_race"
+    }
+  ],
+  "weekly": [
+    {
+      "id": "souk_day",
+      "name_ar": "يوم السوق",
+      "weekday": 5,
+      "name_en": "Friday Souk",
+      "effects": { "market_stalls_open": true, "market_price_multiplier": 1.15, "visitor_spawn_multiplier": 1.6 },
+      "note_ar": "السوق الأسبوعي في ساحة القرية"
+    },
+    {
+      "id": "fishing_contest",
+      "name_ar": "مسابقة الصيد",
+      "weekday": 1,
+      "name_en": "Monday Fishing Contest",
+      "effects": { "fish_bite_rate_multiplier": 1.5, "rare_fish_chance": 0.15 },
+      "tournament_hook": "weekly_fishing_cup"
+    },
+    {
+      "id": "vet_visit",
+      "name_ar": "زيارة الطبيب البيطري",
+      "weekday": 3,
+      "name_en": "Wednesday Vet Visit",
+      "effects": { "animal_heal_discount": 0.5, "animal_mood_bonus": 10 }
+    }
+  ],
+  "tournaments": [
+    {
+      "id": "great_harvest_race",
+      "name_ar": "سباق الحصاد الكبير",
+      "trigger_event": "wheat_harvest_festival",
+      "metric": "wheat_harvested_kg",
+      "duration_days": 3,
+      "rewards": [ { "rank": 1, "item": "golden_sickle", "coins": 500 }, { "rank": 2, "coins": 250 }, { "rank": 3, "coins": 100 } ]
+    },
+    {
+      "id": "weekly_fishing_cup",
+      "name_ar": "كأس الصيد",
+      "trigger_weekly": "fishing_contest",
+      "metric": "biggest_fish_kg",
+      "rewards": [ { "rank": 1, "item": "silver_rod", "coins": 200 }, { "rank": 2, "coins": 100 }, { "rank": 3, "coins": 50 } ]
+    },
+    {
+      "id": "moulid_games_cup",
+      "name_ar": "كأس ألعاب المولد",
+      "trigger_event": "moulid_badawi",
+      "metric": "minigame_score_total",
+      "duration_days": 2,
+      "rewards": [ { "rank": 1, "item": "carousel_ticket_gold", "coins": 300 }, { "rank": 2, "coins": 150 }, { "rank": 3, "coins": 75 } ]
+    }
+  ],
+  "weather": {
+    "types": {
+      "sunny":    { "name_ar": "مشمس",  "crop_growth_multiplier": 1.0,  "watering_multiplier": 1.0, "movement": "normal" },
+      "cloudy":   { "name_ar": "غائم",  "crop_growth_multiplier": 0.95, "watering_multiplier": 0.9, "movement": "normal" },
+      "rain":     { "name_ar": "مطر",   "crop_growth_multiplier": 1.1,  "watering_multiplier": 0.0, "movement": "slow", "auto_waters_crops": true },
+      "khamsin":  { "name_ar": "خماسين", "crop_growth_multiplier": 0.8,  "watering_multiplier": 1.5, "movement": "slow", "crop_damage_chance": 0.05 },
+      "heatwave": { "name_ar": "موجة حر", "crop_growth_multiplier": 0.85, "watering_multiplier": 2.0, "animal_mood_penalty": 15 },
+      "frost":    { "name_ar": "صقيع",  "crop_growth_multiplier": 0.7,  "watering_multiplier": 0.8, "crop_damage_chance": 0.08 },
+      "humid":    { "name_ar": "رطب",   "crop_growth_multiplier": 1.05, "watering_multiplier": 0.7, "movement": "normal" }
+    },
+    "forecast_days": 3
+  }
+}

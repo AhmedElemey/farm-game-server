@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { makeCode, err } = require('./util');
-const { itemConf, currentMultiplier, settleAuction, settleTournament, settleGuildOrder, worldFor } = require('./game-logic');
+const { itemConf, currentMultiplier, seasonMult, settleAuction, settleTournament, settleGuildOrder, worldFor } = require('./game-logic');
+const { seasonFor } = require('./calendar');
 
 const WEEK_MS = 7 * 24 * 3600 * 1000;
 
@@ -16,15 +17,18 @@ module.exports = function gameRoutes(app, pool, authMw, econ) {
     try {
       const r = await pool.query('SELECT item_id, multiplier, updated_at FROM market_state');
       const world = worldFor(new Date());
+      const season = seasonFor(new Date());
+      const seasonId = season ? season.id : null;
       const mults = {};
       const ids = new Set([...Object.keys(econ.items), ...r.rows.map(x => x.item_id)]);
       for (const id of ids) {
         const conf = itemConf(econ, id);
         const row = r.rows.find(x => x.item_id === id);
         const base = row ? currentMultiplier(econ, row, conf) : 1.0;
-        mults[id] = Math.round(base * world.event_market_multiplier * 1000) / 1000;
+        const combined = base * seasonMult(econ, id, seasonId) * world.event_market_multiplier;
+        mults[id] = Math.round(combined * 1000) / 1000;
       }
-      res.json({ multipliers: mults, event_market_multiplier: world.event_market_multiplier, updated_at: new Date().toISOString() });
+      res.json({ multipliers: mults, season: seasonId, event_market_multiplier: world.event_market_multiplier, updated_at: new Date().toISOString() });
     } catch (e) { next(e); }
   });
 
@@ -37,12 +41,14 @@ module.exports = function gameRoutes(app, pool, authMw, econ) {
       const r = await pool.query('SELECT * FROM market_state WHERE item_id = $1', [item_id]);
       const row = r.rows[0] || { multiplier: 1.0, updated_at: new Date() };
       const m = currentMultiplier(econ, row, conf);
+      const season = seasonFor(new Date());
+      const sMult = seasonMult(econ, item_id, season ? season.id : null);
       const eventMult = worldFor(new Date()).event_market_multiplier;
-      const eff = m * eventMult;
+      const eff = m * sMult * eventMult;
       const coins = Math.round(conf.base_price * eff * n);
-      // selling pressure lowers the stored (pre-event) multiplier
-      const drop = Math.max(0, 1 - econ.market.sell_impact_per_unit * n);
-      const newM = Math.max(conf.min_mult, m * drop);
+      // sell pressure: -drop_per_unit per unit, floored at item band / global floor
+      const floor = Math.max(conf.min_mult, econ.market.floor_mult);
+      const newM = Math.max(floor, m - econ.market.drop_per_unit_sold * n);
       await pool.query(
         `INSERT INTO market_state (item_id, multiplier, updated_at) VALUES ($1,$2,now())
          ON CONFLICT (item_id) DO UPDATE SET multiplier = $2, updated_at = now()`, [item_id, newM]);
@@ -50,7 +56,7 @@ module.exports = function gameRoutes(app, pool, authMw, econ) {
         'INSERT INTO market_trades (id, player_id, item_id, count, coins, multiplier) VALUES ($1,$2,$3,$4,$5,$6)',
         [crypto.randomUUID(), req.player.id, item_id, n, coins, eff]);
       await pool.query('UPDATE players SET coins = coins + $1 WHERE id = $2', [coins, req.player.id]);
-      res.json({ coins_received: coins, new_multiplier: Math.round(newM * 1000) / 1000 });
+      res.json({ coins_received: coins, new_multiplier: Math.round(newM * sMult * eventMult * 1000) / 1000 });
     } catch (e) { next(e); }
   });
 
@@ -240,10 +246,15 @@ module.exports = function gameRoutes(app, pool, authMw, econ) {
       } else return t;
     }
     if (r.rows.length === 0) {
+      // rotate through Hamada 10's tournament set with their windows
+      const last = await pool.query('SELECT kind FROM tournaments ORDER BY created_at DESC LIMIT 1');
+      const rot = econ.tournaments.rotation;
+      const lastIdx = last.rows.length ? rot.findIndex(x => x.id === last.rows[0].kind) : -1;
+      const next = rot[(lastIdx + 1) % rot.length];
       const id = crypto.randomUUID();
       const now = Date.now();
-      await pool.query('INSERT INTO tournaments (id, metric, starts_at, ends_at) VALUES ($1,$2,$3,$4)',
-        [id, econ.tournaments.default_metric, new Date(now), new Date(now + WEEK_MS)]);
+      await pool.query('INSERT INTO tournaments (id, kind, metric, starts_at, ends_at) VALUES ($1,$2,$3,$4,$5)',
+        [id, next.id, next.metric, new Date(now), new Date(now + next.window_seconds * 1000)]);
       const again = await pool.query('SELECT * FROM tournaments WHERE id = $1', [id]);
       return again.rows[0];
     }
@@ -267,7 +278,7 @@ module.exports = function gameRoutes(app, pool, authMw, econ) {
         rank = parseInt(higher.rows[0].c, 10) + 1;
       }
       res.json({
-        tournament_id: t.id, metric: t.metric,
+        tournament_id: t.id, tournament: t.kind, metric: t.metric,
         window: { starts_at: t.starts_at, ends_at: t.ends_at },
         your_rank: rank,
         your_score: myScore,

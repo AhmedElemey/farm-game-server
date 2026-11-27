@@ -1,26 +1,276 @@
 {
-  "_comment": "Economy config (Hamada 11 placeholder). Hamada 10 supplies the real market.json; replace items with its base prices and bands.",
-  "default": { "base_price": 10, "min_mult": 0.6, "max_mult": 1.8 },
-  "items": {
-    "wheat": { "base_price": 5, "min_mult": 0.6, "max_mult": 1.8 },
-    "clover_berseem": { "base_price": 4 },
-    "fava_beans": { "base_price": 8 },
-    "onion": { "base_price": 7 },
-    "garlic": { "base_price": 9 },
-    "cotton": { "base_price": 14 },
-    "maize": { "base_price": 6 },
-    "watermelon": { "base_price": 12 },
-    "rice": { "base_price": 8 },
-    "sugarcane": { "base_price": 9 },
-    "molokhia": { "base_price": 6 },
-    "milk": { "base_price": 15 },
-    "eggs": { "base_price": 10 },
-    "wool": { "base_price": 18 },
-    "fish": { "base_price": 16 }
+ "_comment": "Hamada 10 final content v1 (items.json prices + market.json bands/dynamics + tournaments.json prizes + levels.json starting coins).",
+ "default": {
+  "base_price": 10,
+  "min_mult": 0.8,
+  "max_mult": 1.25
+ },
+ "items": {
+  "wheat": {
+   "base_price": 6,
+   "min_mult": 0.8,
+   "max_mult": 1.2
   },
-  "market": { "recovery_tau_hours": 6, "sell_impact_per_unit": 0.001 },
-  "players": { "starting_coins": 200 },
-  "tournaments": { "max_delta_per_minute": 1000, "payout_coins": [1000, 500, 250], "default_metric": "coins_earned" },
-  "auctions": { "anti_snipe_window_sec": 120, "anti_snipe_extend_sec": 120, "min_increment": 5, "items": ["golden_sickle", "silver_rod", "fanoos", "carousel_ticket_gold", "nile_lotus_decor"] },
-  "guilds": { "order_reward_pool_coins": 2000, "order_size_units": 200 }
+  "clover": {
+   "base_price": 10,
+   "min_mult": 0.8,
+   "max_mult": 1.2
+  },
+  "corn": {
+   "base_price": 26,
+   "min_mult": 0.8,
+   "max_mult": 1.25
+  },
+  "tomato": {
+   "base_price": 44,
+   "min_mult": 0.75,
+   "max_mult": 1.3
+  },
+  "potato": {
+   "base_price": 80,
+   "min_mult": 0.8,
+   "max_mult": 1.25
+  },
+  "onion": {
+   "base_price": 146,
+   "min_mult": 0.8,
+   "max_mult": 1.25
+  },
+  "strawberry": {
+   "base_price": 237,
+   "min_mult": 0.75,
+   "max_mult": 1.35
+  },
+  "sugarcane": {
+   "base_price": 433,
+   "min_mult": 0.8,
+   "max_mult": 1.25
+  },
+  "sunflower": {
+   "base_price": 704,
+   "min_mult": 0.8,
+   "max_mult": 1.25
+  },
+  "watermelon": {
+   "base_price": 1933,
+   "min_mult": 0.7,
+   "max_mult": 1.4
+  },
+  "egg": {
+   "base_price": 15,
+   "min_mult": 0.85,
+   "max_mult": 1.2
+  },
+  "duck_egg": {
+   "base_price": 25,
+   "min_mult": 0.85,
+   "max_mult": 1.2
+  },
+  "goat_milk": {
+   "base_price": 45,
+   "min_mult": 0.85,
+   "max_mult": 1.2
+  },
+  "milk": {
+   "base_price": 35,
+   "min_mult": 0.85,
+   "max_mult": 1.2
+  },
+  "buffalo_milk": {
+   "base_price": 60,
+   "min_mult": 0.85,
+   "max_mult": 1.2
+  },
+  "wool": {
+   "base_price": 110,
+   "min_mult": 0.8,
+   "max_mult": 1.3
+  },
+  "fur": {
+   "base_price": 50,
+   "min_mult": 0.8,
+   "max_mult": 1.3
+  },
+  "bread": {
+   "base_price": 135,
+   "min_mult": 0.85,
+   "max_mult": 1.2
+  },
+  "cookies": {
+   "base_price": 172,
+   "min_mult": 0.85,
+   "max_mult": 1.25
+  },
+  "cheese": {
+   "base_price": 297,
+   "min_mult": 0.85,
+   "max_mult": 1.25
+  },
+  "ghee": {
+   "base_price": 460,
+   "min_mult": 0.85,
+   "max_mult": 1.25
+  },
+  "sunflower_oil": {
+   "base_price": 2626,
+   "min_mult": 0.8,
+   "max_mult": 1.3
+  },
+  "molasses": {
+   "base_price": 2239,
+   "min_mult": 0.8,
+   "max_mult": 1.3
+  }
+ },
+ "market": {
+  "drop_per_unit_sold": 0.01,
+  "recover_per_hour": 0.02,
+  "floor_mult": 0.5,
+  "season_in_mult": 1.5,
+  "season_off_mult": 0.7,
+  "crop_tag_map": {
+   "wheat": [
+    "shitwi"
+   ],
+   "clover": [
+    "shitwi"
+   ],
+   "onion": [
+    "shitwi"
+   ],
+   "strawberry": [
+    "shitwi"
+   ],
+   "tomato": [
+    "sayfi"
+   ],
+   "watermelon": [
+    "sayfi"
+   ],
+   "sunflower": [
+    "sayfi"
+   ],
+   "corn": [
+    "sayfi"
+   ],
+   "sugarcane": [
+    "nili"
+   ],
+   "potato": [
+    "shitwi"
+   ]
+  }
+ },
+ "players": {
+  "starting_coins": 100
+ },
+ "tournaments": {
+  "max_delta_per_minute": 1000,
+  "level_bands": [
+   [
+    1,
+    10
+   ],
+   [
+    11,
+    25
+   ],
+   [
+    26,
+    60
+   ]
+  ],
+  "league_mult": [
+   1,
+   2,
+   4
+  ],
+  "rotation": [
+   {
+    "id": "harvest_race",
+    "metric": "crops_harvested",
+    "window_seconds": 86400,
+    "prizes": {
+     "1": {
+      "coins": 500,
+      "xp": 150
+     },
+     "2": {
+      "coins": 300,
+      "xp": 100
+     },
+     "3": {
+      "coins": 150,
+      "xp": 60
+     },
+     "participant": {
+      "coins": 40,
+      "xp": 20
+     }
+    }
+   },
+   {
+    "id": "moulid_games_cup",
+    "metric": "orders_completed",
+    "window_seconds": 172800,
+    "prizes": {
+     "1": {
+      "coins": 500,
+      "xp": 150
+     },
+     "2": {
+      "coins": 300,
+      "xp": 100
+     },
+     "3": {
+      "coins": 150,
+      "xp": 60
+     },
+     "participant": {
+      "coins": 40,
+      "xp": 20
+     }
+    }
+   },
+   {
+    "id": "fishing_cup",
+    "metric": "fish_caught",
+    "window_seconds": 86400,
+    "prizes": {
+     "1": {
+      "coins": 500,
+      "xp": 150
+     },
+     "2": {
+      "coins": 300,
+      "xp": 100
+     },
+     "3": {
+      "coins": 150,
+      "xp": 60
+     },
+     "participant": {
+      "coins": 40,
+      "xp": 20
+     }
+    }
+   }
+  ]
+ },
+ "auctions": {
+  "anti_snipe_window_sec": 120,
+  "anti_snipe_extend_sec": 120,
+  "min_increment": 5,
+  "items": [
+   "golden_sickle",
+   "silver_rod",
+   "fanoos",
+   "carousel_ticket_gold",
+   "nile_lotus_decor"
+  ]
+ },
+ "guilds": {
+  "order_reward_pool_coins": 2000,
+  "order_size_units": 200
+ }
 }

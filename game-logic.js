@@ -6,12 +6,21 @@ function itemConf(econ, itemId) {
   return Object.assign({}, econ.default, econ.items[itemId] || {});
 }
 
-// Lazy multiplier: recover toward 1.0 with time, apply clamp.
+// Lazy multiplier: linear recovery toward 1.0 (recover_per_hour), clamped to item band.
 function currentMultiplier(econ, row, conf) {
-  const tauMs = econ.market.recovery_tau_hours * 3600 * 1000;
-  const dt = Date.now() - new Date(row.updated_at).getTime();
-  const m = 1 + (row.multiplier - 1) * Math.exp(-dt / tauMs);
+  const hours = (Date.now() - new Date(row.updated_at).getTime()) / 3600000;
+  let m = row.multiplier + econ.market.recover_per_hour * hours;
+  if (row.multiplier > 1) m = row.multiplier - econ.market.recover_per_hour * hours; // decay down if above 1
+  m = Math.abs(m - 1) < 0.001 ? 1 : m;
+  if ((row.multiplier - 1) * (m - 1) < 0) m = 1; // don't overshoot past 1
   return Math.min(conf.max_mult, Math.max(conf.min_mult, m));
+}
+
+// Season band for a crop item, from Hamada 10's crop_tag_map vs the live season.
+function seasonMult(econ, itemId, seasonId) {
+  const seasons = econ.market.crop_tag_map[itemId];
+  if (!seasons || !seasonId) return 1.0;
+  return seasons.includes(seasonId) ? econ.market.season_in_mult : econ.market.season_off_mult;
 }
 
 // Losers are refunded at outbid time (see POST /auctions/:id/bid), so settling
@@ -35,15 +44,24 @@ async function settleAuction(pool, a, econ) {
 }
 
 async function settleTournament(pool, t, econ) {
-  const top = await pool.query(
-    `SELECT player_id, score FROM tournament_scores WHERE tournament_id = $1 ORDER BY score DESC LIMIT 3`, [t.id]);
-  for (let i = 0; i < top.rows.length; i++) {
-    const coins = econ.tournaments.payout_coins[i] || 0;
-    await pool.query('UPDATE players SET coins = coins + $1 WHERE id = $2', [coins, top.rows[i].player_id]);
+  // prizes: base 500/300/150 (+40 participant) x league multiplier by player level band
+  const conf = econ.tournaments.rotation.find(r => r.id === t.kind) || econ.tournaments.rotation[0];
+  const scores = await pool.query(
+    `SELECT s.player_id, s.score, p.level FROM tournament_scores s JOIN players p ON p.id = s.player_id
+     WHERE s.tournament_id = $1 ORDER BY s.score DESC`, [t.id]);
+  for (let i = 0; i < scores.rows.length; i++) {
+    const { player_id, score, level } = scores.rows[i];
+    const bandIdx = econ.tournaments.level_bands.findIndex(b => level >= b[0] && level <= b[1]);
+    const mult = econ.tournaments.league_mult[bandIdx] || 1;
+    const rankKey = i < 3 ? String(i + 1) : 'participant';
+    const prize = conf.prizes[rankKey];
+    if (!prize) continue;
+    const coins = prize.coins * mult;
+    await pool.query('UPDATE players SET coins = coins + $1 WHERE id = $2', [coins, player_id]);
     await pool.query(
       `INSERT INTO rewards (id, player_id, kind, payload) VALUES ($1,$2,'tournament_prize',$3)`,
-      [crypto.randomUUID(), top.rows[i].player_id,
-       JSON.stringify({ tournament_id: t.id, rank: i + 1, score: top.rows[i].score, coins })]);
+      [crypto.randomUUID(), player_id,
+       JSON.stringify({ tournament_id: t.id, tournament: t.kind, rank: i + 1, score, coins, xp: prize.xp * mult, league_mult: mult })]);
   }
   await pool.query(`UPDATE tournaments SET status = 'settled' WHERE id = $1`, [t.id]);
 }
@@ -66,4 +84,4 @@ async function settleGuildOrder(pool, o, econ) {
   await pool.query(`UPDATE guild_orders SET status = 'settled' WHERE id = $1`, [o.id]);
 }
 
-module.exports = { itemConf, currentMultiplier, settleAuction, settleTournament, settleGuildOrder, makeCode, err, worldFor };
+module.exports = { itemConf, currentMultiplier, seasonMult, settleAuction, settleTournament, settleGuildOrder, makeCode, err, worldFor };
